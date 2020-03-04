@@ -23,7 +23,7 @@ public class Wander : Agent
     // Update is called once per frame
     void Update()
     {
-        if (sec >= 2)
+        if (sec >= 3)
         {
             point = randomPoint(transform.forward);
             sec = 0;

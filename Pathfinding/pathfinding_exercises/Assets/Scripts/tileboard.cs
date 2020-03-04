@@ -13,7 +13,7 @@ public class tileboard : MonoBehaviour
     void Awake()
     {
         tiles = new List<Tile>();
-        pos = new Vector3(0.5f,1,0.5f);
+        pos = new Vector3(0,1,0);
         for(int i = 0; i < row; i++)
         {
             for(int j = 0; j < col; j++)

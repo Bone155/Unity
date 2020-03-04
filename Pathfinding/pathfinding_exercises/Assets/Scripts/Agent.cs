@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Agent : MonoBehaviour
 {
-    Djikstra dj;
+    public Djikstra dj;
     public Vector3 velocity;
     public float mass = 1;
     public float maxSpeed = 8;
@@ -13,28 +13,18 @@ public class Agent : MonoBehaviour
     public Transform target;
     public List<Vector3> path;
 
-    void Start()
-    {
-        dj = new Djikstra();
-        path = dj.calculatePath(transform.position, target.position);
-    }
-
     // Update is called once per frame
     void Update()
     {
         Vector3 steering = Vector3.ClampMagnitude(steeringForces, maxForce);
         steeringForces = Vector3.zero;
         steering /= mass;
-        transform.position += velocity * Time.deltaTime;
         if (velocity != Vector3.zero)
         {
             transform.forward = velocity.normalized;
         }
-        Steer(steering);
+        steeringForces += steering;
+        
     }
 
-    public void Steer(Vector3 steering)
-    {
-        steeringForces += steering;
-    }
 }

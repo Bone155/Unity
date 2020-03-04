@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Djikstra
+public class Djikstra : MonoBehaviour
 {
-    tileboard tile_board;
+    public tileboard tile_board;
     List<Tile> open;
     List<Tile> close;
-    List<Tile> tiles;
     Tile cur;
     public Tile tile_target;
     public Tile startTile;
@@ -15,33 +14,39 @@ public class Djikstra
     // Start is called before the first frame update
     void Start()
     {
-        tile_board = new tileboard();
         open = new List<Tile>();
         close = new List<Tile>();
-        tiles = tile_board.tiles;
     }
 
-    Tile getStartTile(Vector3 startPos)
+    public bool atTarget(Vector3 pos, Vector3 target)
+    {
+        if (pos.x <= getTargetTile(target).tile.position.x + 0.5 && pos.z <= getTargetTile(target).tile.position.z + 0.5 && pos.x >= getTargetTile(target).tile.position.x - 0.5 && pos.z >= getTargetTile(target).tile.position.z - 0.5)
+            return true;
+        else
+            return false;
+    }
+
+    public Tile getStartTile(Vector3 startPos)
     {
         Tile startTile = new Tile();
-        for (int i = 0; i < tiles.Count; i++)
+        for (int i = 0; i < tile_board.tiles.Count; i++)
         {
-            if (startPos.x < tiles[i].tile.position.x + 0.5 && startPos.z < tiles[i].tile.position.z + 0.5 && startPos.x > tiles[i].tile.position.x - 0.5 && startPos.z > tiles[i].tile.position.z - 0.5)
+            if (startPos.x <= tile_board.tiles[i].tile.position.x + 0.5 && startPos.z <= tile_board.tiles[i].tile.position.z + 0.5 && startPos.x >= tile_board.tiles[i].tile.position.x - 0.5 && startPos.z >= tile_board.tiles[i].tile.position.z - 0.5)
             {
-                startTile = tiles[i];
+                startTile = tile_board.tiles[i];
             }
         }
         return startTile;
     }
 
-    Tile getTargetTile(Vector3 targetPos)
+    public Tile getTargetTile(Vector3 targetPos)
     {
         Tile targetTile = new Tile();
-        for (int i = 0; i < tiles.Count; i++)
+        for (int i = 0; i < tile_board.tiles.Count; i++)
         {
-            if (targetPos.x < tiles[i].tile.position.x + 0.5 && targetPos.z < tiles[i].tile.position.z + 0.5 && targetPos.x > tiles[i].tile.position.x - 0.5 && targetPos.z > tiles[i].tile.position.z - 0.5)
+            if (targetPos.x <= tile_board.tiles[i].tile.position.x + 0.5 && targetPos.z <= tile_board.tiles[i].tile.position.z + 0.5 && targetPos.x >= tile_board.tiles[i].tile.position.x - 0.5 && targetPos.z >= tile_board.tiles[i].tile.position.z - 0.5)
             {
-                targetTile = tiles[i];
+                targetTile = tile_board.tiles[i];
             }
         }
         return targetTile;

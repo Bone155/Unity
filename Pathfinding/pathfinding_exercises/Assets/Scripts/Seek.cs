@@ -2,26 +2,31 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Seek : Agent
+public class Seek : MonoBehaviour
 {
-    int i = 0;
+    public Agent agent;
+    Vector3 force;
+
+    void Start()
+    {
+        agent.path = agent.dj.calculatePath();
+    }
+
     public Vector3 desiredVelocity
     {
         get
         {
-            return (target.position - transform.position).normalized * maxSpeed;
+            return (agent.target.position - transform.position).normalized * agent.maxSpeed;
         }
     }
 
     // Update is called once per frame
     void Update()
     {
-        //Vector3 force = desiredVelocity - velocity;
-        //velocity += force * Time.deltaTime;
-        //transform.position += velocity * Time.deltaTime;
-        transform.position += path[i] * Time.deltaTime;
+        force = desiredVelocity - agent.velocity;
+        agent.velocity += force * Time.deltaTime;
+        transform.position += agent.velocity * Time.deltaTime;
         transform.rotation = Quaternion.LookRotation(desiredVelocity);
-        i++;
     }
 
 }
