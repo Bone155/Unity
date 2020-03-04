@@ -5,28 +5,34 @@ using UnityEngine;
 public class AIPatrol : MonoBehaviour
 {
     Agent agent;
-    public Decision move;
+    public Decision root;
     // Start is called before the first frame update
     void Start()
     {
         agent = GetComponent<Agent>();
-        move = new Waypoint(agent, false);
-        move.makeDecision();
+        root = new Waypoint(agent,
+                new newWayPoint(agent),
+                new seekWayPoint(agent) );
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (agent.dj.atTarget(agent.transform.position, agent.target.position) == true)
+        Decision currentDecision = root;
+        while(currentDecision != null)
         {
-            move = new Waypoint(agent, true); // get new waypoint
-            move.makeDecision();
+            currentDecision = currentDecision.makeDecision();
         }
-        else
-        {
-            move = new Waypoint(agent, false); // move to waypoint
-            move.makeDecision();
-        }
+        //if (agent.dj.atTarget(agent.transform.position, agent.target.position) == true)
+        //{
+        //    move = new Waypoint(agent, true); // get new waypoint
+        //    move.makeDecision();
+        //}
+        //else
+        //{
+        //    move = new Waypoint(agent, false); // move to waypoint
+        //    move.makeDecision();
+        //}
     }
 }
 
@@ -39,26 +45,33 @@ public class Waypoint : Decision //question node // reached waypoint?
 {
     Agent agent;
     public bool branch;
-    Decision decision;
+    Decision closeEnough;
+    Decision tooFar;
+
     public Waypoint() { }
 
-    public Waypoint(Agent agent, bool branch)
+    public Waypoint(Agent agent, Decision closeEnoughDecision, Decision tooFarDecision)
     {
         this.agent = agent;
-        this.branch = branch;
+        closeEnough = closeEnoughDecision;
+        tooFar = tooFarDecision;
     }
 
     public Decision makeDecision()
     {
-        if (branch == true)
+        if(agent.dj.atTarget(agent.transform.position, agent.target.position) == true)
         {
-            decision = new newWayPoint(agent);
+            return closeEnough;
         }
         else
         {
-            decision = new seekWayPoint(agent);
+            return tooFar;
         }
-        return decision.makeDecision();
+        // if the agent has reached its waypoint
+            // return the closeEnoughDecision
+        // otherwise
+            // return the tooFarDecision
+
     }
 
 }
@@ -66,7 +79,6 @@ public class Waypoint : Decision //question node // reached waypoint?
 public class seekWayPoint : Decision //answer node // No // move towards waypoint
 {
     Agent agent;
-
     public seekWayPoint() { }
 
     public seekWayPoint(Agent agent)
@@ -76,7 +88,7 @@ public class seekWayPoint : Decision //answer node // No // move towards waypoin
 
     public Decision makeDecision()
     {
-        agent.GetComponent<Seek>();
+        agent.transform.position += agent.path[agent.idx];
         return null;
     }
 }
@@ -96,6 +108,7 @@ public class newWayPoint : Decision //answer node // yes // get new waypoint
     {
         agent.target.position = new Vector3(Random.Range(0, 9), agent.target.position.y, Random.Range(0, 9));
         agent.path = agent.dj.calculatePath(agent.transform.position, agent.target.position);
+        agent.idx++;
         return null;
     }
 

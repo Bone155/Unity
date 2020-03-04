@@ -8,8 +8,8 @@ public class Djikstra : MonoBehaviour
     List<Tile> open;
     List<Tile> close;
     Tile cur;
-    public Tile tile_target;
-    public Tile startTile;
+    Tile tile_target;
+    Tile startTile;
 
     // Start is called before the first frame update
     void Start()
@@ -20,33 +20,33 @@ public class Djikstra : MonoBehaviour
 
     public bool atTarget(Vector3 pos, Vector3 target)
     {
-        if (pos.x <= getTargetTile(target).tile.position.x + 0.5 && pos.z <= getTargetTile(target).tile.position.z + 0.5 && pos.x >= getTargetTile(target).tile.position.x - 0.5 && pos.z >= getTargetTile(target).tile.position.z - 0.5)
+        if (pos.x <= getTargetTile(tile_board.tiles, target).tile.position.x + 0.5 && pos.z <= getTargetTile(tile_board.tiles, target).tile.position.z + 0.5 && pos.x >= getTargetTile(tile_board.tiles, target).tile.position.x - 0.5 && pos.z >= getTargetTile(tile_board.tiles, target).tile.position.z - 0.5)
             return true;
         else
             return false;
     }
 
-    public Tile getStartTile(Vector3 startPos)
+    public Tile getStartTile(List<Tile> tiles, Vector3 startPos)
     {
         Tile startTile = new Tile();
-        for (int i = 0; i < tile_board.tiles.Count; i++)
+        for (int i = 0; i < tiles.Count; i++)
         {
-            if (startPos.x <= tile_board.tiles[i].tile.position.x + 0.5 && startPos.z <= tile_board.tiles[i].tile.position.z + 0.5 && startPos.x >= tile_board.tiles[i].tile.position.x - 0.5 && startPos.z >= tile_board.tiles[i].tile.position.z - 0.5)
+            if (startPos.x <= tiles[i].tile.position.x + 0.5 && startPos.z <= tiles[i].tile.position.z + 0.5 && startPos.x >= tiles[i].tile.position.x - 0.5 && startPos.z >= tiles[i].tile.position.z - 0.5)
             {
-                startTile = tile_board.tiles[i];
+                startTile = tiles[i];
             }
         }
         return startTile;
     }
 
-    public Tile getTargetTile(Vector3 targetPos)
+    public Tile getTargetTile(List<Tile> tiles, Vector3 targetPos)
     {
         Tile targetTile = new Tile();
-        for (int i = 0; i < tile_board.tiles.Count; i++)
+        for (int i = 0; i < tiles.Count; i++)
         {
-            if (targetPos.x <= tile_board.tiles[i].tile.position.x + 0.5 && targetPos.z <= tile_board.tiles[i].tile.position.z + 0.5 && targetPos.x >= tile_board.tiles[i].tile.position.x - 0.5 && targetPos.z >= tile_board.tiles[i].tile.position.z - 0.5)
+            if (targetPos.x <= tiles[i].tile.position.x + 0.5 && targetPos.z <= tiles[i].tile.position.z + 0.5 && targetPos.x >= tiles[i].tile.position.x - 0.5 && targetPos.z >= tiles[i].tile.position.z - 0.5)
             {
-                targetTile = tile_board.tiles[i];
+                targetTile = tiles[i];
             }
         }
         return targetTile;
@@ -54,8 +54,9 @@ public class Djikstra : MonoBehaviour
 
     public List<Vector3> calculatePath(Vector3 start, Vector3 target)
     {
-        startTile = getStartTile(start);
-        tile_target = getTargetTile(target);
+        startTile = getStartTile(tile_board.tiles, start);
+        startTile.gScore = 0;
+        tile_target = getTargetTile(tile_board.tiles, target);
         open.Add(startTile);
         while (open.Count > 0)
         {
@@ -67,13 +68,7 @@ public class Djikstra : MonoBehaviour
 
             for (int i = 0; i < cur.Connections.Count; i++)
             {
-                if (cur.gScore + 1 < cur.Connections[i].gScore)
-                {
-                    cur.Connections[i].gScore = cur.gScore + 1;
-                    cur.Connections[i].previous = cur;
-                    open.Add(cur.Connections[i]);
-                }
-                if (cur.Connections[i] == tile_target)
+                if (cur == tile_target)
                 {
                     if (cur.gScore < tile_target.gScore)
                     {
@@ -81,19 +76,26 @@ public class Djikstra : MonoBehaviour
                         tile_target.previous = cur;
                     }
                 }
+                if (cur.gScore + 1 < cur.Connections[i].gScore)
+                {
+                    cur.Connections[i].gScore = cur.gScore + 1;
+                    cur.Connections[i].previous = cur;
+                    open.Add(cur.Connections[i]);
+                }
             }
 
             gScoreSort(open);
         }
 
         List<Vector3> targetPath = new List<Vector3>();
-        while (cur.previous != null && cur.previous != startTile)
+        while (cur != null && cur != startTile)
         {
             Tile node = cur.previous;
             targetPath.Add(cur.tile.position);
             cur = node;
         }
         targetPath.Reverse();
+        close.Clear();
         return targetPath;
     }
 

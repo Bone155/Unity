@@ -7,11 +7,6 @@ public class Seek : MonoBehaviour
     public Agent agent;
     Vector3 force;
 
-    void Start()
-    {
-        agent.path = agent.dj.calculatePath();
-    }
-
     public Vector3 desiredVelocity
     {
         get
